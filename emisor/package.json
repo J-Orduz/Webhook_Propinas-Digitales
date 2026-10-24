@@ -1,0 +1,13 @@
+{
+  "name": "webhook-emisor",
+  "version": "1.0.0",
+  "main": "emisor.js",
+  "scripts": {
+    "start": "node emisor.js"
+  },
+  "description": "",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
