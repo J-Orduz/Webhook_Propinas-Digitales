@@ -1,0 +1,74 @@
+name: webhook_app
+services:
+  
+  receptor:
+    build: ./receptor
+    container_name: webhook_receptor
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DB_HOST=db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=webhook
+      - DB_PORT=5432
+      - WEBHOOK_SECRET=ingenieria_de_software_para_web_backend
+    depends_on:
+      db:
+        condition: service_healthy
+
+  emisor:
+    build: ./emisor
+    container_name: webhook_emisor
+    environment:
+      - NGROK_API_URL=http://ngrok:4040/api/tunnels
+      - WEBHOOK_SECRET=ingenieria_de_software_para_web_backend
+    depends_on:
+      - ngrok
+
+  db:
+    image: postgres:17-alpine
+    container_name: webhook_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=webhook
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./receptor/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d webhook"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    depends_on:
+      db:
+        condition: service_healthy
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: webhook_ngrok
+    restart: unless-stopped
+    command:
+      - "http"
+      - "receptor:3000" # Apunta directamente al contenedor del receptor
+      - "--log=stdout"
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN:-}
+    ports:
+      - "4040:4040" # Panel de control local de ngrok para inspeccionar peticiones
+    depends_on:
+      - receptor
