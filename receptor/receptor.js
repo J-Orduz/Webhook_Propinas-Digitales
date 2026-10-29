@@ -34,7 +34,13 @@ app.post('/webhooks/propinas', async (req, res) => {
     .digest('hex');
 
   // Comparar de manera segura para evitar ataques de temporización
-  if (!crypto.timingSafeEqual(Buffer.from(signatureHeader), Buffer.from(computedSignature))) {
+  let firmasCoinciden = false;
+  try {
+    firmasCoinciden = crypto.timingSafeEqual(Buffer.from(signatureHeader), Buffer.from(computedSignature));
+  } catch (e) {
+    firmasCoinciden = false;
+  }
+  if (!firmasCoinciden) {
     console.error('Petición fraudulenta: Las firmas criptográficas no coinciden');
     return res.status(401).send('Firma inválida. No autorizado.');
   }

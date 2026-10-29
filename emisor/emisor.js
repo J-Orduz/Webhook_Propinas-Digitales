@@ -55,25 +55,26 @@ async function dispararWebhook() {
   console.log(`Enviando webhook a: ${urlDestino}...`);
 
   // Realizar la petición HTTP POST utilizando el módulo nativo fetch de Node 18+
-  fetch(urlDestino, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Signature': signature // Enviamos la firma en los headers
-    },
-    body: bodyString
-  })
-    .then(async (res) => {
-      if (res.status === 200) {
-        const data = await res.json();
-        console.log(`Webhook entregado con éxito. El receptor respondió HTTP 200 OK (ID: ${data.id})`);
-      } else {
-        console.error(`El receptor rechazó la petición con código: ${res.status}`);
-      }
-    })
-    .catch((err) => {
-      console.error('Error de red al intentar conectar con el receptor:', err.message);
+  try {
+    const res = await fetch(urlDestino, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Signature': signature // Enviamos la firma en los headers
+      },
+      body: bodyString
     });
+
+    if (res.status === 200) {
+      const data = await res.json();
+      console.log(`Webhook entregado con éxito. El receptor respondió HTTP 200 OK (ID: ${data.id})`);
+    } else {
+      const text = await res.text();
+      console.error(`El receptor rechazó la petición con código: ${res.status} - ${text}`);
+    }
+  } catch (err) {
+    console.error('Error de red al intentar conectar con el receptor:', err.message);
+  }
 }
 
 
