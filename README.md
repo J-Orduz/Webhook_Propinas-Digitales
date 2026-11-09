@@ -6,6 +6,8 @@ Los **Webhooks** son mecanismos de comunicación asíncrona basados en el estilo
 
 Esta práctica es una guía para entender el funcionamiento de los **Webhooks**. Simula un sistema de propinas digitales dividido en dos servicios independientes que se comunican a través de internet público utilizando un túnel seguro de **Ngrok**.
 
+Para más información acerca de los Webhooks, puede consultar las siguiente diapositivas en Google Slides: https://docs.google.com/presentation/d/1ir_-hm6VcOXsqlUAy7CqBTmx3yT-WaCK8YF3vu9kOJ4/edit?usp=sharing 
+
 ## Requisitos previos
 
 Antes de ejecutar esta práctica, se debe cumplir con lo siguiente:
